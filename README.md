@@ -120,3 +120,15 @@ When the type changes, the previous instance has its `dispose` method called, if
 ## Undo
 
 When you construct an `Undo` object you pass it the root live object and it immediately captures the current state. It does this inside `autorun`, so if the state changes it will be recaptured. The second time this happens, the previous state is pushed onto the undo stack. `Undo` has public properties `canUndo` and `canRedo`, and methods `undo` and `redo`, so you can link those up to a couple of toolbar buttons in an editor.
+
+### Optimized Undo
+
+As MobX can have more than one stores. Each time a change happens, serializing all data of all stores seems to be a waste of storage. So I optimized the `json-mobx`'s undo/redo scheme. 
+
+*Only one store's data is serialzied and push to the history states when a change happens. Of course we only have one history management object, however, each element in its history state stack is not the history state of the root store(containing all the store objects), but the history state of one exact store. We keep an `id` for connecting each store with its history states.*
+
+[see details](http://magicbell.beanstu.io/front-end/2018/10/07/undo-redo-with-mobx.html).
+
+### Usage of Optimized Undo
+
+Create one OptimizedUndo instance in global. Then call `optimizedUndo.register(storeObject)` for each store you want to be enabled with undo/redo.
